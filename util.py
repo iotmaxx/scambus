@@ -38,9 +38,9 @@ def loadsample(path):
 	a = array('B', f.read())
 	
 	if debug:
-		print '-- file contents --'
-		print a
-		print '-- eof --'
+		print ('-- file contents --')
+		print (a)
+		print ('-- eof --')
 		
 	return a   
 	

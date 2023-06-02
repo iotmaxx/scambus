@@ -41,10 +41,10 @@ class WMBusFrame():
         """
 
         if len(arr)-1 != arr[0]:
-            print "WARNING: frame length field does not match effective frame length! Decoding might be unreliable. Check your input."
+            print ("WARNING: frame length field does not match effective frame length! Decoding might be unreliable. Check your input.")
             
-            print "frame[0]: ", arr[0]
-            print "len(frame)-1: ", len(arr)-1
+            print (f"frame[0]: {arr[0]}")
+            print (f"len(frame)-1: {len(arr)-1}")
         
         if (arr is not None and arr[0] >= 11):
             self.length = arr[0]
@@ -91,24 +91,33 @@ class WMBusFrame():
                     self.data = bytearray(spec.decrypt("%s" % self.data))
                    
                     if debug:
-                        print "dec: ", util.tohex(self.data)
+                        print (f"dec: {util.tohex(self.data)}")
                     
                     # check whether the first two bytes are 2F
                     if (self.data[0:2] != '\x2F\x2F'):
-                        print util.tohex(self.data)
+                        print (util.tohex(self.data))
                         raise Exception("Decryption failed")
             
-            self.data = bytearray(self.data.lstrip('\x2F').rstrip('\x2F'))
+#            print(f"RGL: self.data: {' '.join(format(x, '02x') for x in self.data)}")
+            start=0
+            end=len(self.data)
+            while self.data[start] == 0x2f:
+                start+=1
+            while self.data[end-1] == 0x2f:
+                end-=1
+            self.data = self.data[start:end]
+#            print(f"RGL: self.data: {' '.join(format(x, '02x') for x in self.data)}")
+#            self.data = bytearray(self.data.lstrip('\x2F').rstrip('\x2F'))
 
             if debug:
-                print "cut: ", util.tohex(self.data)
+                print (f"cut: {util.tohex(self.data)}")
 
             while len(self.data) > 0:
                 record = WMBusDataRecord()
                 self.data = record.parse(self.data)            
                 self.records.append(record)
         else:
-            print "(%d) " % arr[0] + util.tohex(arr) 
+            print ("(%d) " % arr[0] + util.tohex(arr) )
             raise Exception("Invalid frame length")
             
     def get_manufacturer_short(self):
@@ -173,7 +182,7 @@ class WMBusFrame():
         2: additionally log data records
         """
         line = datetime.now().strftime("%b %d %H:%M:%S") + " "
-        line += self.get_manufacturer_short() + " "
+        line += util.tohex(self.get_manufacturer_short()) + " "
         line += util.tohex(self.get_device_id()) + " "
         line += self.get_function_code() + " "
         
@@ -218,6 +227,8 @@ class WMBusFrame():
                          
                          line += '\nValue:\t' + util.tohex(val)
                          line += '\n--'
+
+#                         print(val)
                          
         else:
             line += 'Data: ' + util.tohex(self.data)
@@ -225,7 +236,7 @@ class WMBusFrame():
         line += "v%0.3d" % self.get_device_version() + " "
         line += self.get_device_type() + " (" + util.tohex(self.address[5]) + ") "
         '''
-        print line
+        print (line)
 
     def is_without_tl(self):
         """ Returns True if the CI field indicates no transport layer

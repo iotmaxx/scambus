@@ -1,4 +1,4 @@
-#! /usr/bin/env python2.7
+#! /usr/bin/env python
 
 import getopt, sys, time, util
 from wmbus import WMBusFrame
@@ -19,7 +19,7 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"vt:f:",["text=", "filename="])
     except getopt.GetoptError:
-        print usagetext
+        print (usagetext)
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-f", "--filename"):
@@ -31,14 +31,14 @@ def main(argv):
             verbosity = 2
     
     if verbosity > 0:
-        print "verbosity: ", verbosity
-        print "filename: ", filename
-        print "txt: ",text
+        print (f"verbosity: {verbosity}")
+        print (f"filename: {filename}")
+        print (f"txt: {text}")
 
     capture = bytearray().fromhex(text)
     
     if verbosity > 0: 
-        print "hex: ", util.tohex(capture)
+        print (f"hex: {util.tohex(capture)}")
 
     frame = WMBusFrame()
     frame.parse(capture, keys)
